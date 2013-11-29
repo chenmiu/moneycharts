@@ -1,0 +1,40 @@
+{% extends 'www/html/base.html' %}
+{% block main %}
+<legend>Stocks List</legend>
+<table class="table table-bordered table-condensed" >
+    <thead>
+    <tr class="success"><th>Code</th><th>Number</th><th>Price</th></tr>
+    </thead>
+    <tbody>
+    <tr id="s-free" >
+        <td class="code">余额</td>
+        <td class="num"></td>
+        <td class="money">{{user.free}}</td>
+    </tr>
+    {% for code, s in current %}
+    <tr id="s{{code}}" >
+        <td class="code">{{code}}</td>
+        <td class="num">{{s.num}}</td>
+        <td class="money">{{s.money}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<legend>Stock History</legend>
+<table class="table table-bordered table-condensed" >
+    <thead>
+    <tr class="success"><th>Code</th><th>Number</th><th>Price</th></tr>
+    </thead>
+    <tbody>
+    {% for code, s in history %}
+    <tr id="s{{code}}" >
+        <td class="code">{{code}}</td>
+        <td class="num">{{s.num}}</td>
+        <td class="money">{{s.money}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

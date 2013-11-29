@@ -1,25 +1,44 @@
-# -*- coding: UTF-8 -*-
+#!/usr/bin/python
+#-*- coding: UTF-8 -*-
+
+import logging, re, time
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from www.models import *
-import logging, re, time
+from django.utils import timezone
 from decimal import Decimal
 from datetime import datetime, timedelta
-from django.utils import timezone
-
-def index(request):
-    user = get_object_or_404(User, pk="talebook@foxmail.com")
-    return render(request, 'www/html/index.html', {'user': user})
+from www.models import *
+from www.codelist import Codes
 
 def login(request):
     return HttpResponse("login")
 
-def k_day(request):
+def index(request):
+    user = get_object_or_404(User, pk="talebook@foxmail.com")
+    return render(request, 'www/html/index.html', {'pid': 'index', 'user': user})
+
+def chart_k(request):
     user = get_object_or_404(User, pk="talebook@foxmail.com")
     nodes = user.node_set.filter(type=Node.TYPES['DAY']).order_by('date').all()
-    return render(request, 'www/html/k.html', {'nodes': nodes})
+    return render(request, 'www/html/k.html', {'pid': 'chart_k', 'nodes': nodes})
+
+def stock_list(request):
+    def Name(code):
+        return Codes.get(code.strip(), code)
+    user = get_object_or_404(User, pk="talebook@foxmail.com")
+    stocks = eval(user.stocks_raw)
+    current = [ (Name(code), s) for code,s in stocks.items() if s['num'] > 0 or code == '' ]
+    history = [ (Name(code), s) for code,s in stocks.items() if s['num'] == 0 and code != '' ]
+    history.sort( lambda x,y: cmp(y[1]['money'], x[1]['money']) )
+    return render(request, 'www/html/stock_list.html', {'pid': 'stock_list', 'user': user, 'current': current, 'history': history})
+
 
 def build(request):
+    def Sum(stocks):
+        val = 0
+        for s in stocks.values():
+            val += s['money']
+        return val
     user = get_object_or_404(User, pk='talebook@foxmail.com')
     bills = user.bill_set.order_by('date').all()
     idx = 0
@@ -28,33 +47,52 @@ def build(request):
     today = bills[len(bills)-1].date
     n = Node(type=Node.TYPES['DAY'], open=user.capital, date=day, user=user)
     n.low = n.high = n.close = n.open
+
+    user.node_set.all().delete()
+    stocks = {}
+    free = user.capital
     while idx < len(bills) and day <= today:
         b = bills[idx]
         if n.date.date() == b.date.date():
             n.date = b.date
-            n.low += b.stock_money
-            n.high += b.stock_money
-            n.close += b.stock_money
+            s = stocks.get(b.stock_code, {'num': 0, 'money': 0})
+            s['num'] += b.stock_num
+            s['money'] += b.stock_money
+            free += b.stock_money
+            if free != b.balance:
+                raise
+            stocks[b.stock_code] = s
             idx += 1
         else:
+            n.close = free + Sum(stocks)
             if n.open == n.close:
                 n.open -= n.close/20
+            n.high = n.close
+            n.low = free
             n.save()
             day += oneday
             n = Node(type=Node.TYPES['DAY'], open=n.close, date=day, user=user)
             n.low = n.high = n.close = n.open
 
+    user.stocks_num = 0
+    for s in stocks.values():
+        if s['num'] > 0:
+            user.stocks_num += 1
+    user.stocks_raw = repr(stocks)
+    user.free = free
+    user.save()
     return render(request, 'www/html/import.html', {'bills': bills})
 
-def get_date(value):
-    return datetime.strptime(value[0:8], "%Y%m%d")
-
-def D(val):
-    if val == u'---':
-        return Decimal(0)
-    return Decimal(val)
 
 def import_bill(request):
+    def get_date(value):
+        return datetime.strptime(value[0:8], "%Y%m%d")
+
+    def D(val):
+        if val == u'---':
+            return Decimal(0)
+        return Decimal(val)
+
     files = request.FILES
     f = files['data']
     data = f.read()
@@ -103,7 +141,7 @@ def import_bill(request):
                 b.type = Bill.TYPES['BUY']
             else:
                 b.type = Bill.TYPES['SELL']
-        if b.date > today:
+        if b.date.date() > today.date():
             raise "not large than today"
         b.user = user
         b.save()

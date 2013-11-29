@@ -7,8 +7,10 @@ from datetime import datetime
 class User(models.Model):
     email       = models.EmailField(primary_key=True, unique=True, max_length=128)
     password    = models.CharField(max_length=128, default="")
-    stocks      = models.IntegerField(default=Decimal(0))
+    stocks_num  = models.IntegerField(default=Decimal(0))
+    stocks_raw  = models.TextField(default="")
     capital     = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+    free        = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
 
 class Bill(models.Model):
     TYPES = {

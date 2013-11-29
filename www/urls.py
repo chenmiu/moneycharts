@@ -5,9 +5,8 @@ urlpatterns = patterns('',
     url(r'^login/$', 'www.views.login'),
     url(r'^import/$', 'www.views.import_bill'),
 
-    url(r'^k/day/$', 'www.views.k_day'),
-    url(r'^k/week/$', 'www.views.index', name='home'),
-    url(r'^k/month/$', 'www.views.index', name='home'),
+    url(r'^chart/k/$', 'www.views.chart_k'),
+    url(r'^stock/list/$', 'www.views.stock_list'),
 
     url(r'^build/$', 'www.views.build'),
 )

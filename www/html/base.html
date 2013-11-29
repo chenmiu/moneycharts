@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <link href="http://libs.baidu.com/bootstrap/2.0.4/css/bootstrap.css" rel="stylesheet">
+        <script src="http://libs.baidu.com/bootstrap/2.0.4/js/bootstrap.js"></script>
+        {% block meta %}{% endblock %}
+    </head>
+    <body>
+
+        <div class="navbar">
+            <div class="navbar-inner">
+                <a class="brand" href="#">Money Charts</a>
+                <ul class="nav">
+                    <li {%if pid = "index"%}class="active"{% endif %} ><a href="/">Index</a></li>
+                    <li {%if pid = "chart_k"%}class="active"{% endif %} ><a href="/chart/k/">Moneys</a></li>
+                    <li {%if pid = "chart_me"%}class="active"{% endif %} ><a href="/chart/me/">Month Earn</a></li>
+                    <li {%if pid = "stock_list"%}class="active"{% endif %} ><a href="/stock/list/">Stocks</a></li>
+                </ul>
+            </div>
+        </div>
+
+        {% block container %}
+        <div class="container">
+            <div class="row">
+                <div class="offset2 span8">{% block main %}{% endblock %}</div>
+            </div>
+        </div>
+        {% endblock %}
+    </body>
+</html>
