@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 def index(request):
     user = get_object_or_404(User, pk="talebook@foxmail.com")
-    return render(request, 'www/html/k.html', {'user': user})
+    return render(request, 'www/html/index.html', {'user': user})
 
 def login(request):
     return HttpResponse("login")
