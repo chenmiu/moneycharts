@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>charts</title>
+        <link href="http://libs.baidu.com/bootstrap/2.0.4/css/bootstrap.css" rel="stylesheet">
+        <script src="http://libs.baidu.com/bootstrap/2.0.4/js/bootstrap.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="offset2 span8">
+                    <legend>charts</legend>
+                    <form method="POST" action="/import/" enctype="multipart/form-data">
+                        <input type="file" name="data" />
+                        <input class="btn" type="submit" value="Upload" />
+                        {% csrf_token %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
