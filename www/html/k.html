@@ -31,54 +31,7 @@
 {% endfor %}
             ];
 
-                    chartData[i] = ({
-                        date: newDate,
-                        open: open,
-                        close: close,
-                        high: high,
-                        low: low,
-                        volume: volume
-                    });
             function generateChartData() {
-                return ;
-                var firstDate = new Date();
-                firstDate.setHours(0, 0, 0, 0);
-                firstDate.setDate(firstDate.getDate() - 2000);
-
-                for (var i = 0; i < 2000; i++) {
-                    var newDate = new Date(firstDate);
-
-                    newDate.setDate(newDate.getDate() + i);
-
-                    var open = Math.round(Math.random() * (30) + 100);
-                    var close = open + Math.round(Math.random() * (15) - Math.random() * 10);
-
-                    var low;
-                    if (open < close) {
-                        low = open - Math.round(Math.random() * 5);
-                    } else {
-                        low = close - Math.round(Math.random() * 5);
-                    }
-
-                    var high;
-                    if (open < close) {
-                        high = close + Math.round(Math.random() * 5);
-                    } else {
-                        high = open + Math.round(Math.random() * 5);
-                    }
-
-                    var volume = Math.round(Math.random() * (1000 + i)) + 100 + i;
-
-
-                    chartData[i] = ({
-                        date: newDate,
-                        open: open,
-                        close: close,
-                        high: high,
-                        low: low,
-                        volume: volume
-                    });
-                }
             }
 
             function createStockChart() {
@@ -126,10 +79,10 @@
                 graph.highField = "high";
                 graph.lowField = "low";
                 graph.valueField = "close";
-                graph.lineColor = "#7f8da9";
-                graph.fillColors = "#7f8da9";
-                graph.negativeLineColor = "#db4c3c";
-                graph.negativeFillColors = "#db4c3c";
+                graph.lineColor = "#FF0000";
+                graph.fillColors = "#FF0000";
+                graph.negativeLineColor = "#00FF00";
+                graph.negativeFillColors = "#00FF00";
                 graph.fillAlphas = 1;
                 graph.balloonText = "open:<b>[[open]]</b><br>close:<b>[[close]]</b><br>low:<b>[[low]]</b><br>high:<b>[[high]]</b>";
                 graph.useDataSetColors = false;
@@ -167,8 +120,8 @@
                 periodSelector.position = "bottom";
                 periodSelector.periods = [{
                     period: "DD",
-                    count: 10,
-                    label: "10 days"
+                    count: 30,
+                    label: "30 days"
                 }, {
                     period: "MM",
                     selected: true,

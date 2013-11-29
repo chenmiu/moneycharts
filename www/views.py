@@ -5,6 +5,7 @@ from www.models import *
 import logging, re, time
 from decimal import Decimal
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 def index(request):
     user = get_object_or_404(User, pk="talebook@foxmail.com")
@@ -24,17 +25,20 @@ def build(request):
     idx = 0
     day = bills[idx].date
     oneday = timedelta(days=1)
+    today = bills[len(bills)-1].date
     n = Node(type=Node.TYPES['DAY'], open=user.capital, date=day, user=user)
     n.low = n.high = n.close = n.open
-    while idx != len(bills):
+    while idx < len(bills) and day <= today:
         b = bills[idx]
-        if n.date == b.date:
+        if n.date.date() == b.date.date():
             n.date = b.date
             n.low += b.stock_money
             n.high += b.stock_money
             n.close += b.stock_money
             idx += 1
         else:
+            if n.open == n.close:
+                n.open -= n.close/20
             n.save()
             day += oneday
             n = Node(type=Node.TYPES['DAY'], open=n.close, date=day, user=user)
@@ -62,6 +66,7 @@ def import_bill(request):
     user = get_object_or_404(User, pk='talebook@foxmail.com')
     bills = []
 
+    today = timezone.now()
     p = re.compile("    *")
     for line in data.split("\n"):
         if not line.startswith(u'人民币'):
@@ -98,6 +103,8 @@ def import_bill(request):
                 b.type = Bill.TYPES['BUY']
             else:
                 b.type = Bill.TYPES['SELL']
+        if b.date > today:
+            raise "not large than today"
         b.user = user
         b.save()
         bills.append( b )
