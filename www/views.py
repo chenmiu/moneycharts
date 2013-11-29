@@ -45,6 +45,11 @@ def build(request):
 def get_date(value):
     return datetime.strptime(value[0:8], "%Y%m%d")
 
+def D(val):
+    if val == u'---':
+        return Decimal(0)
+    return Decimal(val)
+
 def import_bill(request):
     files = request.FILES
     f = files['data']
@@ -63,12 +68,12 @@ def import_bill(request):
             continue
         b = Bill()
         vals = p.split(line)
-        if '---' in line:
+        if vals[3] == u'---':
             vals = [''] + vals
             b.id = vals[2]
             b.date = get_date(vals[2])
-            b.stock_money = Decimal(vals[5])
-            b.balance = Decimal(vals[6])
+            b.stock_money = D(vals[5])
+            b.balance = D(vals[6])
             b.name = vals[8]
             if b.stock_money > 0:
                 b.type = Bill.TYPES['PUT']
@@ -79,15 +84,15 @@ def import_bill(request):
             b.date = get_date(vals[2])
             b.stock_name = vals[1]
             b.stock_code = vals[13]
-            b.stock_price = Decimal(vals[3])
-            b.stock_num = Decimal(vals[4])
-            b.stock_money = Decimal(vals[5])
-            b.balance = Decimal(vals[6])
+            b.stock_price = D(vals[3])
+            b.stock_num = D(vals[4])
+            b.stock_money = D(vals[5])
+            b.balance = D(vals[6])
             b.name = vals[8]
-            b.fee1 = Decimal(vals[9])
-            b.tax  = Decimal(vals[10])
-            b.fee2 = Decimal(vals[11])
-            b.fee3 = Decimal(vals[12])
+            b.fee1 = D(vals[9])
+            b.tax  = D(vals[10])
+            b.fee2 = D(vals[11])
+            b.fee3 = D(vals[12])
             b.account = vals[14]
             if b.stock_money > 0:
                 b.type = Bill.TYPES['BUY']
