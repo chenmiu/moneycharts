@@ -201,11 +201,11 @@
     <div class="row">
         <div class="span12">
             {% if user.profile.is_outdate %}
+            <div class="alert">
+                <p>正在后台更新您的数据...</p>
+            </div>
             <div style="margin: 300px auto;">
-                <div class="alert">
-                    <p>正在后台更新您的数据...</p>
                     <div id="loading"></div>
-                </div>
             </div>
             {% else %}
 

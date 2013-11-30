@@ -231,12 +231,12 @@ def import_bill(request):
 def chart_k(request):
     if request.method == 'POST':
         return build(request)
-    linetype = request.GET.get('linetype', 0)
+    linetype = request.GET.get('linetype', "0")
     nodes = request.user.node_set.filter(type=Node.TYPES['DAY']).order_by('date').all()
     return render(request, 'www/html/k.html', {'pid': 'chart_k', 'nodes': nodes, 'linetype': linetype})
 
 @login_required
 def chart_earn(request):
-    return render(request, 'www/html/profile.html', {'pid': 'index'})
+    return stat(request)
 
 
