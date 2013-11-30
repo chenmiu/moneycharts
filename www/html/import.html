@@ -1,26 +1,7 @@
-<html>
-    <head>
-        <title>charts</title>
-        <link href="http://libs.baidu.com/bootstrap/2.0.4/css/bootstrap.css" rel="stylesheet">
-        <script src="http://libs.baidu.com/bootstrap/2.0.4/js/bootstrap.js"></script>
-    </head>
-    <body>
-        <div class="container">
-            <div class="row">
-                <div class="span12">
-                    <legend>Confirm:</legend>
-                    <pre>{% for b in bills %}
+{% extends 'www/html/profile.html' %}
+{% block extra %}
+<legend>Bill Details:</legend>
+<pre>{% for b in bills %}
 {{b.date}}, {{b.id}}, {{b.name}}, {{b.stock_money}}
 {% endfor %}</pre>
-                    <form method="POST" action="/import/" enctype="multipart/form-data">
-                        <input type="file" name="data" />
-                        <input class="btn" type="submit" value="Upload" />
-                        {% csrf_token %}
-                    </form>
-                    <a href="/build" class="btn btn-success" target="_blank">Build K-Charts</a>
-                    <a href="/k/day" class="btn btn-danger" target="_blank">View K-Charts</a>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
+{% end block %}

@@ -1,0 +1,18 @@
+{% extends 'www/html/base.html' %}
+{% block main %}
+<legend>1. Upload stock bills</legend>
+<form method="POST" action="/import/" enctype="multipart/form-data">
+    <input type="file" name="data" />
+    <input class="btn" type="submit" value="Upload" />
+    {% csrf_token %}
+</form>
+
+<legend>2. Generate Charts</legend>
+<a href="/build" class="btn btn-success">Build K-Charts</a>
+
+<legend>3. View</legend>
+<a href="/chart/k/" class="btn btn-danger">View K-Charts</a>
+
+{% block extra %}{% endblock %}
+
+{% endblock %}

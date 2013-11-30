@@ -1,11 +1,7 @@
 {% extends 'www/html/base.html' %}
 {% block main %}
-<legend>charts</legend>
-<form method="POST" action="/import/" enctype="multipart/form-data">
-    <input type="file" name="data" />
-    <input class="btn" type="submit" value="Upload" />
-    {% csrf_token %}
-</form>
-<a href="/build" class="btn btn-success" target="_blank">Build K-Charts</a>
-<a href="/k/day" class="btn btn-danger" target="_blank">View K-Charts</a>
+<legend>Hi</legend>
+<p class="lead">
+Hoping you know your money much better. Please <a href="/accounts/login/">login</a>.
+</p>
 {% endblock %}

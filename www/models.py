@@ -1,16 +1,19 @@
-# -*- coding: UTF-8 -*-
+#!/usr/bin/python
+#-*- coding: UTF-8 -*-
+
 from django.db import models
 from decimal import Decimal
 from datetime import datetime
+from django.contrib.auth.models import User
 
 # Create your models here.
-class User(models.Model):
-    email       = models.EmailField(primary_key=True, unique=True, max_length=128)
-    password    = models.CharField(max_length=128, default="")
+class Profile(models.Model):
+    user = models.OneToOneField(User)
     stocks_num  = models.IntegerField(default=Decimal(0))
     stocks_raw  = models.TextField(default="")
-    capital     = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+    base        = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     free        = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+
 
 class Bill(models.Model):
     TYPES = {
@@ -22,20 +25,28 @@ class Bill(models.Model):
 
     id      = models.CharField(primary_key=True, unique=True, max_length=16, default="")
     type    = models.IntegerField(default=Decimal(0))
-    name    = models.CharField(max_length=128, default="")        # 业务名
+
+    # 业务名、日期、余额
+    name    = models.CharField(max_length=128, default="")
     date    = models.DateTimeField()
     balance = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+
+    # 印花税、手续费、过户费、结算费
     tax     = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     fee1    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     fee2    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     fee3    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
-    account = models.CharField(max_length=128, default="")
-    stock_name  = models.CharField(max_length=16, default="")        # 股票名
-    stock_code  = models.CharField(max_length=16, default="")        # 股票代码
+
+    # 股票名称、代码、价格、数量、总价
+    stock_name  = models.CharField(max_length=16, default="")
+    stock_code  = models.CharField(max_length=16, default="")
     stock_price = models.IntegerField(default=Decimal(0))
     stock_num   = models.IntegerField(default=Decimal(0))
     stock_money = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
-    user    = models.ForeignKey("User")
+
+    # 用户、账户ID
+    user    = models.ForeignKey(User)
+    account = models.CharField(max_length=128, default="")
 
 class Node(models.Model):
     TYPES = {
@@ -49,7 +60,9 @@ class Node(models.Model):
     high    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     open    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     close   = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
-    capital = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
-    user    = models.ForeignKey("User")
-    unique_together = ( ('user', 'type, date'), )
+    base    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+    user    = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = ( ('user', 'type', 'date'), )
 
