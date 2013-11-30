@@ -1,0 +1,79 @@
+{% extends 'www/html/base.html' %}
+{% block meta %}
+<style>
+    .table-fixed {
+        table-layout: fixed;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+
+{% set base = user.profile.base %}
+{% set total = user.profile.free + user.profile.stocks_val %}
+{% set cost  = tax+fee1+fee2+fee3 %}
+<legend>收益 <small><a href="/chart/earn">详情</a></small></legend>
+<table class="table table-fixed table-bordered table-condensed" >
+    <thead>
+        <tr>
+            <th>本金</th>
+            <th>余额</th>
+            <th>股值</th>
+            <th>总市值</th>
+            <th>浮盈</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{base}}</td>
+            <td>{{user.profile.free}}</td>
+            <td>{{user.profile.stocks_val}}</td>
+            <td>{{total}}</td>
+            <td><strong style="color: red">{{total-base}}（{{ ((total-base)*100/base) |int}}%）</strong></td>
+        </tr>
+    </tbody>
+</table>
+<br/>
+
+<legend>支出</legend>
+<table class="table table-fixed table-bordered table-condensed" >
+    <thead>
+        <tr>
+            <th>印花税</th>
+            <th>手续费</th>
+            <th>过户费</th>
+            <th>结算费</th>
+            <th>总税费</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{tax}}</td>
+            <td>{{fee1}}</td>
+            <td>{{fee2}}</td>
+            <td>{{fee3}}</td>
+            <td><strong style="color: red">{{cost}}</strong></td>
+        </tr>
+    </tbody>
+</table>
+<br/>
+
+<legend>流动性</legend>
+<table class="table table-fixed table-bordered table-condensed" >
+    <tr>
+        <th>本金</th>
+        <th>买卖总额</th>
+        <th>流动性</th>
+        <th>税费/本金</th>
+        <th>税费/流动性</th>
+    </tr>
+    <tr>
+        <td>{{base}}</td>
+        <td>{{money}}</td>
+        <td>{{ (money/base) | int}}倍</td>
+        <td>{{ (100*cost/base) | int}}%</td>
+        <td>{{ (1000*cost/money) | int}}‰</td>
+    </tr>
+</table>
+{% endblock %}
+

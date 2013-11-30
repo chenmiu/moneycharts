@@ -9,9 +9,13 @@ urlpatterns = patterns('',
     url(r'^import/$', 'www.views.import_bill'),
 
     url(r'^chart/k/$', 'www.views.chart_k'),
+    url(r'^chart/earn/$', 'www.views.chart_earn'),
+
     url(r'^stock/list/$', 'www.views.stock_list'),
 
     url(r'^build/$', 'www.views.build'),
+    url(r'^stat/$', 'www.views.stat'),
+    url(r'^about/$', 'www.views.stat'),
 
     url(r'^accounts/login/$', login, {'template_name': "www/html/login.html"}),
     url(r'^accounts/logout/$', logout, {'template_name': "www/html/logout.html"}),

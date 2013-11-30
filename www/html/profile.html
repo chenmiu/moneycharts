@@ -1,18 +1,26 @@
 {% extends 'www/html/base.html' %}
 {% block main %}
-<legend>1. Upload stock bills</legend>
-<form method="POST" action="/import/" enctype="multipart/form-data">
-    <input type="file" name="data" />
-    <input class="btn" type="submit" value="Upload" />
+<legend>1. 上传资金流水（<small>暂时仅支持招商证券</small>）</legend>
+<form method="POST" action="/import/"
+    class="form-horizontal" enctype="multipart/form-data">
     {% csrf_token %}
+    <div class="control-group">
+        <label class="control-label" for="data">选择流水文件(txt)</label>
+        <div class="controls">
+            <input class="" type="file" name="data" />
+        </div>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-large btn-primary">Upload</button>
+    </div>
 </form>
+<br/>
 
-<legend>2. Generate Charts</legend>
-<a href="/build" class="btn btn-success">Build K-Charts</a>
-
-<legend>3. View</legend>
-<a href="/chart/k/" class="btn btn-danger">View K-Charts</a>
+<legend>2. 查看报告</legend>
+<div class="text-center">
+<a href="/chart/k/" class="btn ">View K-Charts</a>
+</div>
 
 {% block extra %}{% endblock %}
-
 {% endblock %}

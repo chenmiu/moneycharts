@@ -1,3 +1,6 @@
+#!/usr/bin/python
+#-*- coding: UTF-8 -*-
+
 # Django settings for moneycharts project.
 
 import os
@@ -88,10 +91,14 @@ STATICFILES_FINDERS = (
 SECRET_KEY = '@h@y%ijs1_xm@%bfsn*5(d3chz!6fxxrgh#4d5+gj3sq47=ekx'
 
 # List of callables that know how to import templates from various sources.
+DEFAULT_JINJA2_TEMPLATE_EXTENSION = '.html'
+DEFAULT_JINJA2_TEMPLATE_INTERCEPT_RE = r"^(?!admin/).*"
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #'django.template.loaders.filesystem.Loader',
+    #'django.template.loaders.app_directories.Loader',
+    #'django.template.loaders.eggs.Loader',
+    'django_jinja.loaders.AppLoader',
+    'django_jinja.loaders.FileSystemLoader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -127,6 +134,7 @@ INSTALLED_APPS = (
     'moneycharts',
     'www',
     'south',
+    'django_jinja',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -142,18 +150,74 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugFalse'
         }
     },
+    'formatters': {
+        'standard': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+    },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
+        'logfile': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': ROOT_DIR + "/log.txt",
+            'maxBytes': 50000,
+            'backupCount': 10,
+            'formatter': 'standard',
+        },
+        'console':{
+            'level':'INFO',
+            'class':'logging.StreamHandler',
+            'formatter': 'standard'
+        },
     },
     'loggers': {
+        'django': {
+            'handlers':['console'],
+            'level':'WARN',
+            'propagate': True,
+        },
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['console'],
             'level': 'ERROR',
             'propagate': True,
         },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'www': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+        },
+        '*': {
+            'handlers': ['console', 'logfile'],
+            'level': 'DEBUG',
+        },
     }
 }
+
+CACHES = {
+        'x': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/django_cache',
+        },
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'cache_table',
+            'OPTIONS': {
+                'TIMEOUT': 86400,
+            },
+        }
+    }
+

@@ -8,11 +8,13 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Profile(models.Model):
-    user = models.OneToOneField(User)
+    user        = models.OneToOneField(User)
     stocks_num  = models.IntegerField(default=Decimal(0))
     stocks_raw  = models.TextField(default="")
+    stocks_val  = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     base        = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     free        = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+    is_outdate  = models.IntegerField(default=0)
 
 
 class Bill(models.Model):
@@ -65,4 +67,8 @@ class Node(models.Model):
 
     class Meta:
         unique_together = ( ('user', 'type', 'date'), )
+
+class SimpleCache(models.Model):
+    key = models.CharField(primary_key=True, max_length="256")
+    val = models.TextField(default="")
 
