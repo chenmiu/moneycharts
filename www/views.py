@@ -6,6 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from decimal import Decimal
 from datetime import datetime, timedelta
 from www.models import *
@@ -27,8 +28,18 @@ def stock_list(request):
         return Codes.get(code.strip(), code)
     try: stocks = eval(request.user.profile.stocks_raw)
     except: stocks = {}
-    current = [ (Name(code), s) for code,s in stocks.items() if s['num'] > 0 or code == '' ]
-    history = [ (Name(code), s) for code,s in stocks.items() if s['num'] == 0 and code != '' ]
+
+    yql = YQL()
+    current = []
+    history = []
+    for code,s in stocks.items():
+        if code == '': continue
+        if s['num'] > 0:
+            s['worth'] = yql.stock(code) * s['num']
+            s['earn'] = s['worth'] + s['money']
+            current.append( (Name(code), s) )
+        else:
+            history.append( (Name(code), s) )
     history.sort( lambda x,y: cmp(y[1]['money'], x[1]['money']) )
     return render(request, 'www/html/stock/list.html', {'current': current, 'history': history})
 
@@ -90,6 +101,10 @@ def chart_build(request):
     profile = request.user.profile
     request.user.node_set.all().delete()
     bills = request.user.bill_set.order_by('date').all()
+    if bills.count() == 0:
+        profile.is_outdate = 0
+        profile.save()
+        return HttpResponse("no bills?")
 
     # get stock history data
     querys = {}
@@ -166,9 +181,10 @@ def chart_build(request):
 @login_required(login_url="/account/login/")
 def bill_update(request):
     setattr(request.user, 'view', "bill_update")
-    files = request.FILES
-    f = files['data']
-    data = f.read()
+    if 'data' not in request.FILES:
+        messages.add_message(request, messages.ERROR, '请选择一个资金流水文件。')
+        return HttpResponseRedirect("/")
+    data = request.FILES['data'].read()
     try: data = data.decode('UTF-8')
     except:
         try: data = data.decode('GBK')
@@ -185,7 +201,8 @@ def bill_update(request):
         vals = p.split(line)
         if vals[3] == u'---':
             vals = [''] + vals
-            b.id = vals[2]
+            b.account = vals[14]
+            b.id = ";".join([ str(b.user_id), b.account, vals[2] ])
             b.date = get_date(vals[2])
             b.stock_money = D(vals[5])
             b.balance = D(vals[6])
@@ -195,7 +212,8 @@ def bill_update(request):
             else:
                 b.type = Bill.TYPES['GET']
         else:
-            b.id = vals[2]
+            b.account = vals[14]
+            b.id = ";".join([ str(b.user_id), b.account, vals[2] ])
             b.date = get_date(vals[2])
             b.stock_name = vals[1]
             b.stock_code = vals[13]
@@ -208,7 +226,6 @@ def bill_update(request):
             b.tax  = D(vals[10])
             b.fee2 = D(vals[11])
             b.fee3 = D(vals[12])
-            b.account = vals[14]
             if b.stock_money > 0:
                 b.type = Bill.TYPES['SELL']
             else:
@@ -228,7 +245,8 @@ def bill_update(request):
 
     request.user.profile.is_outdate = 1
     request.user.profile.save()
-    return render(request, 'www/html/bill/update.html', {'bills': bills})
+    return HttpResponseRedirect("/chart/k/")
+    #return render(request, 'www/html/bill/update.html', {'bills': bills})
 
 @login_required(login_url="/account/login/")
 def chart_k(request):

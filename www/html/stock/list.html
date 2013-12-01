@@ -1,28 +1,40 @@
 {% extends 'www/html/base.html' %}
 {% block meta %}
+<style>
+    .table-fixed { table-layout: fixed; }
+</style>
 <title>持股 - MoneyCharts</title>
 {% endblock %}
 
 {% block main %}
 <legend>持股</legend>
-<table class="table table-bordered table-condensed" >
+<table class="table table-fixed table-bordered table-condensed" >
     <thead>
-    <tr class="success"><th>股票</th><th>收益</th><th>数量</th></tr>
+        <tr class="success">
+            <th>股票</th>
+            <th>市值</th>
+            <th>数量</th>
+            <th title="该股票上所有买卖累积的总收益。可能与您当前券商软件显示的本次收益有差异。">
+                累积收益
+                <i class="icon-question-sign"></i>
+            </th>
+        </tr>
     </thead>
     <tbody>
     <tr id="s-free" >
         <td class="code">余额</td>
         <td class="money">{{user.profile.free}}</td>
-        <td class="num"></td>
+        <td class="num"> - </td>
+        <td class="price"> - </td>
     </tr>
     {% for code, s in current %}
-    {% if s.num %}
     <tr id="s{{code}}" >
         <td class="code">{{code}}</td>
-        <td class="money">{{s.money}}</td>
+        <td class="worth">{{s.worth}}</td>
         <td class="num">{{s.num}}</td>
+        <td class="money">{{s.earn}}</td>
+        <!-- 投入：{{s.money}} -->
     </tr>
-    {% endif %}
     {% endfor %}
     </tbody>
 </table>
@@ -30,7 +42,7 @@
 <legend>历史</legend>
 <table class="table table-bordered table-condensed" >
     <thead>
-    <tr class="success"><th>股票</th><th>收益</th></tr>
+    <tr class="success"><th>股票</th><th>累积收益</th></tr>
     </thead>
     <tbody>
     {% for code, s in history %}

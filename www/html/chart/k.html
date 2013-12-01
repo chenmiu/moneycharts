@@ -5,7 +5,6 @@
 <script src="/m/amcharts/amcharts.js" type="text/javascript"></script>
 <script src="/m/amcharts/serial.js" type="text/javascript"></script>
 <script src="/m/amcharts/amstock.js" type="text/javascript"></script>
-<script src="http://fgnass.github.io/spin.js/dist/spin.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
     AmCharts.ready(function () {
@@ -36,7 +35,7 @@
 }
 {% if not loop.last %},{% endif %}
 {% endfor %}
-            ];
+];
 
             function generateChartData() {
             }
@@ -92,12 +91,12 @@
                 graph.negativeFillColors = "#00FF00";
                 graph.fillAlphas = 1;
                 graph.balloonText = ""
-                    + "open: <b>[[open]]</b><br/>"
-                    + "close:<b>[[close]]</b><br/>"
-                    + "low:  <b>[[low]]</b><br/>"
-                    + "high: <b>[[high]]</b><br/>"
+                    + "开盘：<b>[[open]]</b><br/>"
+                    + "收盘：<b>[[close]]</b><br/>"
+                    + "最低：<b>[[low]]</b><br/>"
+                    + "最高：<b>[[high]]</b><br/>"
                     + "----<br/>"
-                    + "base: <b>[[base]]</b><br/>";
+                    + "本金：<b>[[base]]</b><br/>";
                 graph.useDataSetColors = false;
                 stockPanel.addStockGraph(graph);
 
@@ -155,60 +154,14 @@
                 chart.write('chartdiv');
             }
 
-            function rebuild() {
-                var opts = {
-                    lines: 12, // The number of lines to draw
-                    length: 7, // The length of each line
-                    width: 5, // The line thickness
-                    radius: 10, // The radius of the inner circle
-                    corners: 1, // Corner roundness (0..1)
-                    rotate: 0, // The rotation offset
-                    direction: 1, // 1: clockwise, -1: counterclockwise
-                    color: '#000', // #rgb or #rrggbb or array of colors
-                    speed: 1, // Rounds per second
-                    trail: 100, // Afterglow percentage
-                    shadow: true, // Whether to render a shadow
-                    hwaccel: false, // Whether to use hardware acceleration
-                    className: 'spinner', // The CSS class to assign to the spinner
-                    zIndex: 2e9, // The z-index (defaults to 2000000000)
-                    top: 'auto', // Top position relative to parent in px
-                    left: 'auto' // Left position relative to parent in px
-                };
-                var target = document.getElementById('loading');
-                var spinner = new Spinner(opts).spin(target);
-                $.ajax({
-                    url: '/chart/build/',
-                    type: 'GET',
-                    dataType: 'html',
-                    success: function(html) {
-                        location.reload();
-                    },
-                    error: function() {
-                        alert("Error happend! Please try again.")
-                    }
-                });
-            }
-
-            {% if user.profile.is_outdate %}
-            $(document).ready(function() { rebuild(); });
-            {% endif %}
-
         </script>
 {% endblock %}
 
 {% block container %}
+{% if nodes %}
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span12">
-            {% if user.profile.is_outdate %}
-            <div class="alert">
-                <p>正在后台更新您的数据...</p>
-            </div>
-            <div style="margin: 300px auto;">
-                    <div id="loading"></div>
-            </div>
-            {% else %}
-
             <div class="btn-toolbar">
                 <div class="btn-group">
                     <form class="form-inline" method="POST" action="">
@@ -224,9 +177,11 @@
             <div style="background-color:#FFFFFF">
                 <div id="chartdiv" style="width:100%; height:600px;"></div>
             </div>
-            {% endif %}
         </div>
     </div>
 </div>
+{% else %}
+{{ super() }}
+{% endif %}
 {% endblock %}
 

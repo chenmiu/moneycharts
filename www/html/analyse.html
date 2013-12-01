@@ -10,6 +10,7 @@
 {% block main %}
 
 {% set base = user.profile.base %}
+
 {% set total = user.profile.free + user.profile.stocks_val %}
 {% set cost  = tax+fee1+fee2+fee3 %}
 <legend>收益 <small><a href="/chart/earn">详情</a></small></legend>
@@ -29,7 +30,11 @@
             <td>{{user.profile.free}}</td>
             <td>{{user.profile.stocks_val}}</td>
             <td>{{total}}</td>
-            <td><strong style="color: red">{{total-base}}（{{ ((total-base)*100/base) |int}}%）</strong></td>
+            {% if base == 0 %}
+            <td> - </td>
+            {% else %}
+            <td><strong style="color: red">{{total-base}}（{{ (100*total/base -100) |int}}%）</strong></td>
+            {% endif %}
         </tr>
     </tbody>
 </table>
@@ -70,9 +75,19 @@
     <tr>
         <td>{{base}}</td>
         <td>{{money}}</td>
+        {% if base == 0 %}
+        <td> - </td>
+        <td> - </td>
+        {% else %}
         <td>{{ (money/base) | int}}倍</td>
         <td>{{ (100*cost/base) | int}}%</td>
+        {% endif %}
+
+        {% if money == 0 %}
+        <td> - </td>
+        {% else %}
         <td>{{ (1000*cost/money) | int}}‰</td>
+        {% endif %}
     </tr>
 </table>
 {% endblock %}

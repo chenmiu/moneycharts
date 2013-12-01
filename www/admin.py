@@ -3,10 +3,13 @@ from www.models import *
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'stocks_num', 'base', 'free')
+    list_filter = ('user',)
 class BillAdmin(admin.ModelAdmin):
     list_display = ('user', 'date', 'id', 'type', 'name', 'balance', 'stock_code', 'stock_num', 'stock_money')
+    list_filter = ('user',)
 class NodeAdmin(admin.ModelAdmin):
     list_display = ('type', 'date', 'low', 'high', 'open', 'close', 'base')
+    list_filter = ('user',)
 class SimpleCacheAdmin(admin.ModelAdmin):
     list_display = ('key', )
 
