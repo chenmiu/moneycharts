@@ -11,6 +11,7 @@ urlpatterns = patterns('',
 
     url(r'^bill/update/$', 'www.views.bill_update'),
 
+    url(r'^chart/build/$', 'www.views.chart_build'),
     url(r'^chart/k/$', 'www.views.chart_k'),
     url(r'^chart/e/$', 'www.views.chart_e'),
 

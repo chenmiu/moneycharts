@@ -5,6 +5,7 @@
 
 {% block main %}
 <div class="page-header"><h1>您好</h1></div>
+{% if user.profile.base > 0 %}
 <div class="lead">
     <p>
     {% set total = user.profile.free + user.profile.stocks_val %}
@@ -19,6 +20,7 @@
     共有{{user.bill_set.count()}}笔资金操作, 平均每月{{(30*user.bill_set.count()/(b-a).days)|int}}笔交易。
     </p>
 </div>
+{% endif %}
 
 
 <p>
@@ -32,7 +34,7 @@
     <p>资金流水记录可以在券商股票软件中导出，一般是TXT文本文件。</p>
     <p>（系统暂时仅支持招商证券的资金流水。）</p>
     <br/>
-    <form method="POST" action="/import/"
+    <form method="POST" action="/bill/update/"
         class="form-horizontal" enctype="multipart/form-data">
         {% csrf_token %}
         <input class="span6" type="file" name="data" />

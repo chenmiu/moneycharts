@@ -17,7 +17,7 @@ class YQL:
             return code + suffix
         if code.isdigit():
             if int(code) >= 600000:
-                return code + ".SH"
+                return code + ".SS"
             else:
                 return code + ".SZ"
         return code
@@ -36,7 +36,32 @@ class YQL:
         j = json.loads(html)
         return j['query']['results']
 
-    def stock(self, stocks):
+    def stock(self, s):
+        c_key = "oquote."+s
+        today = dt.now().date()
+        try:
+            c = pickle.loads(SimpleCache.objects.get(key=c_key).val)
+            if c['date'] >= today: return c['data']
+        except: pass
+
+        code = self.fmt(s)
+        yql = u'SELECT * FROM yahoo.finance.oquote WHERE symbol="%s"' % code
+        results = self.run(yql)
+        if not results: return Decimal(0)
+        data = Decimal(results['option']['price'])
+
+        # set to cache
+        c_val = {'date': today, 'data': data}
+        SimpleCache(key=c_key, val=pickle.dumps(c_val)).save()
+        return data
+
+    def stocks(self, stocks):
+        data = {}
+        for s in stocks:
+            data[s] = self.stock(s)
+        return data
+
+    def abc(self, stocks):
         # check cache
         c_key = "_".join(stocks)
         today = dt.now().date()
@@ -51,7 +76,8 @@ class YQL:
 
         quote = results['quote']
         if isinstance(quote, dict):
-            return Decimal(quote['LastTradePriceOnly'])
+            k = stocks[0]
+            return {k: Decimal(quote['LastTradePriceOnly'])}
 
         data = dict( (obj['symbol'].split(".")[0], Decimal(obj['LastTradePriceOnly'])) for obj in quote )
         # set to cache
@@ -67,8 +93,8 @@ class YQL:
         yql = tpl % ( code, begin, end)
         results = self.run(yql)
         if results == None:
-            if not suffix:
-                return self.stock_history_(stock_code, start_date, end_date, ".SS")
+            #if not suffix:
+                #return self.stock_history_(stock_code, start_date, end_date, ".SS")
             return []
 
         quote = results['quote']

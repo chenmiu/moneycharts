@@ -10,7 +10,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 from www.models import *
 from www.codelist import Codes
-from www.yql import YQL
+from www.yahoo import YQL
 
 
 def index(request):
@@ -25,7 +25,8 @@ def stock_list(request):
     setattr(request.user, 'view', "stock_list")
     def Name(code):
         return Codes.get(code.strip(), code)
-    stocks = eval(request.user.profile.stocks_raw)
+    try: stocks = eval(request.user.profile.stocks_raw)
+    except: stocks = {}
     current = [ (Name(code), s) for code,s in stocks.items() if s['num'] > 0 or code == '' ]
     history = [ (Name(code), s) for code,s in stocks.items() if s['num'] == 0 and code != '' ]
     history.sort( lambda x,y: cmp(y[1]['money'], x[1]['money']) )
@@ -34,13 +35,14 @@ def stock_list(request):
 def get_stock_worth(stocks):
     yql = YQL()
     active = dict( (c,s) for c,s in stocks.items() if s['num'] > 0 )
-    prices = yql.stock(active.keys())
+    prices = yql.stocks(active.keys())
     return sum( prices[c]*s['num'] for c,s in active.items() )
 
 @login_required(login_url="/account/login/")
 def analyse(request):
     setattr(request.user, 'view', "analyse")
-    stocks = eval(request.user.profile.stocks_raw)
+    try: stocks = eval(request.user.profile.stocks_raw)
+    except: stocks = {}
     request.user.profile.stocks_val = get_stock_worth(stocks)
 
     bills = request.user.bill_set.all()

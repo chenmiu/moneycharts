@@ -177,7 +177,7 @@
                 var target = document.getElementById('loading');
                 var spinner = new Spinner(opts).spin(target);
                 $.ajax({
-                    url: '/build/',
+                    url: '/chart/build/',
                     type: 'GET',
                     dataType: 'html',
                     success: function(html) {
