@@ -1,12 +1,4 @@
-<style>
-	.logo { cursor: pointer; }
-    .logo .money { color: red; }
-    .logo .charts { color: green; }
-    .logo:hover { text-decoration: none; }
-    .logo:hover .money { color: green; }
-    .logo:hover .charts { color: red; }
-</style>
-<h1><a class="brand logo" href="/"><span class="money">Money</span><span class="charts">Charts</span></a></h1>
+<legend><h1><a class="brand logo" href="http://moneycharts.talebook.org/"><span class="money">Money</span><span class="charts">Charts</span></a></h1></legend>
 
 **MoneyCharts**是一个简单的网站，目的是帮助一个炒股新手（我自己）总结自己，客观看待多年来的股市折腾结果，试图在埋头的交易中发现闪光的东西。
 
