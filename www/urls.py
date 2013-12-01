@@ -6,18 +6,17 @@ from django.contrib.auth.views import login, logout
 
 urlpatterns = patterns('',
     url(r'^$', 'www.views.index'),
-    url(r'^import/$', 'www.views.import_bill'),
+    url(r'^analyse/$', 'www.views.analyse'),
+    url(r'^about/$', 'www.views.about'),
+
+    url(r'^bill/update/$', 'www.views.bill_update'),
 
     url(r'^chart/k/$', 'www.views.chart_k'),
-    url(r'^chart/earn/$', 'www.views.chart_earn'),
+    url(r'^chart/e/$', 'www.views.chart_e'),
 
     url(r'^stock/list/$', 'www.views.stock_list'),
 
-    url(r'^build/$', 'www.views.build'),
-    url(r'^stat/$', 'www.views.stat'),
-    url(r'^about/$', 'www.views.stat'),
-
-    url(r'^accounts/login/$', login, {'template_name': "www/html/login.html"}),
-    url(r'^accounts/logout/$', logout, {'template_name': "www/html/logout.html"}),
-    url(r'^accounts/profile/$', 'www.views.index'),
+    url(r'^account/login/$', login, {'template_name': "www/html/account/login.html"}),
+    url(r'^account/logout/$', logout, {'template_name': "www/html/account/logout.html"}),
+    url(r'^account/profile/$', 'www.views.index'),
 )

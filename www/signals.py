@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 def create_profile(sender, **kwargs):
     user = kwargs['instance']
     if not kwargs['created']:
-        Profile(user=user).save()
+        try: Profile(user=user).save()
+        except: pass
 
 post_save.connect(create_profile, sender=User)
 

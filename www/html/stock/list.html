@@ -1,4 +1,8 @@
 {% extends 'www/html/base.html' %}
+{% block meta %}
+<title>持股 - MoneyCharts</title>
+{% endblock %}
+
 {% block main %}
 <legend>持股</legend>
 <table class="table table-bordered table-condensed" >
@@ -23,7 +27,7 @@
     </tbody>
 </table>
 
-<legend>持股（历史）</legend>
+<legend>历史</legend>
 <table class="table table-bordered table-condensed" >
     <thead>
     <tr class="success"><th>股票</th><th>收益</th></tr>

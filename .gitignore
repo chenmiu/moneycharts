@@ -36,3 +36,4 @@ nosetests.xml
 .pydevproject
 database.db
 log.txt
+.*.swp

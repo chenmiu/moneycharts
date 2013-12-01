@@ -14,22 +14,22 @@ from www.yql import YQL
 
 
 def index(request):
+    setattr(request.user, 'view', "index")
     if not request.user.is_authenticated():
-        return render(request, 'www/html/index.html', {'pid': 'index'})
-    yql = YQL()
-    a = yql.stock_history("300250", datetime(2013, 10, 1), datetime(2013, 11,30))
-    return render(request, 'www/html/profile.html', {'pid': 'index'})
+        return render(request, 'www/html/index.html')
+    return render(request, 'www/html/profile.html')
 
 
-@login_required
+@login_required(login_url="/account/login/")
 def stock_list(request):
+    setattr(request.user, 'view', "stock_list")
     def Name(code):
         return Codes.get(code.strip(), code)
     stocks = eval(request.user.profile.stocks_raw)
     current = [ (Name(code), s) for code,s in stocks.items() if s['num'] > 0 or code == '' ]
     history = [ (Name(code), s) for code,s in stocks.items() if s['num'] == 0 and code != '' ]
     history.sort( lambda x,y: cmp(y[1]['money'], x[1]['money']) )
-    return render(request, 'www/html/stock_list.html', {'pid': 'stock_list', 'current': current, 'history': history})
+    return render(request, 'www/html/stock/list.html', {'current': current, 'history': history})
 
 def get_stock_worth(stocks):
     yql = YQL()
@@ -37,8 +37,9 @@ def get_stock_worth(stocks):
     prices = yql.stock(active.keys())
     return sum( prices[c]*s['num'] for c,s in active.items() )
 
-@login_required
-def stat(request):
+@login_required(login_url="/account/login/")
+def analyse(request):
+    setattr(request.user, 'view', "analyse")
     stocks = eval(request.user.profile.stocks_raw)
     request.user.profile.stocks_val = get_stock_worth(stocks)
 
@@ -56,14 +57,13 @@ def stat(request):
         fee2 += b.fee2
         fee3 += b.fee3
     args = {
-            'pid': 'stat',
             'money': money,
             'tax': tax,
             'fee1': fee1,
             'fee2': fee2,
             'fee3': fee3,
         }
-    return render(request, 'www/html/stat.html', args)
+    return render(request, 'www/html/analyse.html', args)
 
 def bisect_find(infos, code, day):
     '''有序查找day当天、或前一天的数据'''
@@ -83,8 +83,8 @@ def D(val):
         return Decimal(0)
     return Decimal(val)
 
-@login_required
-def build(request):
+@login_required(login_url="/account/login/")
+def chart_build(request):
     profile = request.user.profile
     request.user.node_set.all().delete()
     bills = request.user.bill_set.order_by('date').all()
@@ -161,8 +161,9 @@ def build(request):
     return HttpResponseRedirect('/chart/k/')
 
 
-@login_required
-def import_bill(request):
+@login_required(login_url="/account/login/")
+def bill_update(request):
+    setattr(request.user, 'view', "bill_update")
     files = request.FILES
     f = files['data']
     data = f.read()
@@ -225,18 +226,23 @@ def import_bill(request):
 
     request.user.profile.is_outdate = 1
     request.user.profile.save()
-    return render(request, 'www/html/import.html', {'bills': bills})
+    return render(request, 'www/html/bill/update.html', {'bills': bills})
 
-@login_required
+@login_required(login_url="/account/login/")
 def chart_k(request):
+    setattr(request.user, 'view', "chart_k")
     if request.method == 'POST':
-        return build(request)
+        return chart_build(request)
     linetype = request.GET.get('linetype', "0")
     nodes = request.user.node_set.filter(type=Node.TYPES['DAY']).order_by('date').all()
-    return render(request, 'www/html/k.html', {'pid': 'chart_k', 'nodes': nodes, 'linetype': linetype})
+    return render(request, 'www/html/chart/k.html', {'nodes': nodes, 'linetype': linetype})
 
-@login_required
-def chart_earn(request):
-    return stat(request)
+@login_required(login_url="/account/login/")
+def chart_e(request):
+    setattr(request.user, 'view', "chart_e")
+    return render(request, 'www/html/chart/e.html')
 
+def about(request):
+    setattr(request.user, 'view', "about")
+    return render(request, 'www/html/about.html')
 

@@ -1,25 +1,43 @@
 {% extends 'www/html/base.html' %}
+{% block meta %}
+<title>MoneyCharts</title>
+{% endblock %}
+
 {% block main %}
-<legend>1. 上传资金流水（<small>暂时仅支持招商证券</small>）</legend>
-<form method="POST" action="/import/"
-    class="form-horizontal" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="control-group">
-        <label class="control-label" for="data">选择流水文件(txt)</label>
-        <div class="controls">
-            <input class="" type="file" name="data" />
-        </div>
-    </div>
+<div class="page-header"><h1>您好</h1></div>
+<div class="lead">
+    <p>
+    {% set total = user.profile.free + user.profile.stocks_val %}
+    {% set r = (100*total/user.profile.base-100) %}
+    当前持股{{user.profile.stocks_num}}个，总市值￥{{total}}
+    （<span style="background-color: {% if r < 0 %}#00FF00{% else %}red{%endif%}">{{ r|int }} %</span>）。
+    </p>
+    <p>
+    {% set a = user.bill_set.first().date %}
+    {% set b = user.bill_set.last().date %}
+    {{a.year}}年{{a.month}}月{{a.day}}日至今，
+    共有{{user.bill_set.count()}}笔资金操作, 平均每月{{(30*user.bill_set.count()/(b-a).days)|int}}笔交易。
+    </p>
+</div>
 
-    <div class="text-center">
-        <button type="submit" class="btn btn-large btn-primary">Upload</button>
-    </div>
-</form>
-<br/>
 
-<legend>2. 查看报告</legend>
-<div class="text-center">
-<a href="/chart/k/" class="btn ">View K-Charts</a>
+<p>
+您可以<a href="#" onclick="$('#upload').toggle()">更新资金流水</a>，
+或是查看<a href="/chart/k/" >资金曲线</a>。
+</p>
+
+<div id="upload" class="alert alert-info" style="margin-top: 48px; display: none" >
+    <button type="button" class="close"  onclick="$('#upload').toggle()" >&times;</button>
+    <br/>
+    <p>资金流水记录可以在券商股票软件中导出，一般是TXT文本文件。</p>
+    <p>（系统暂时仅支持招商证券的资金流水。）</p>
+    <br/>
+    <form method="POST" action="/import/"
+        class="form-horizontal" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input class="span6" type="file" name="data" />
+        <button type="submit" class="btn btn-primary">提交更新</button>
+    </form>
 </div>
 
 {% block extra %}{% endblock %}
