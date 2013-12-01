@@ -16,7 +16,10 @@ urlpatterns = patterns('',
 
     url(r'^stock/list/$', 'www.views.stock_list'),
 
+    url(r'^account/reg/$', 'www.views.index'),
+    url(r'^account/edit/$', 'www.views.index'),
     url(r'^account/login/$', login, {'template_name': "www/html/account/login.html"}),
     url(r'^account/logout/$', logout, {'template_name': "www/html/account/logout.html"}),
     url(r'^account/profile/$', 'www.views.index'),
+    url(r'^accounts/profile/$', 'www.views.index'),
 )
