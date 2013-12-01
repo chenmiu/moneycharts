@@ -9,12 +9,19 @@
         <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
         <!--<link href="http://libs.baidu.com/bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">-->
         {% block meta %}{% endblock %}
+        <style>
+            .logo .money { color: red; }
+            .logo .charts { color: green; }
+            .logo:hover { text-decoration: none; }
+            .logo:hover .money { color: green; }
+            .logo:hover .charts { color: red; }
+        </style>
     </head>
     <body>
 
         <div class="navbar">
             <div class="navbar-inner">
-                <a class="brand" href="#">MoneyCharts</a>
+                <a class="brand logo" href="#"><span class="money">Money</span><span class="charts">Charts</span></a>
                 <ul class="nav">
                     <li {%if user.view == "index" %}class="active"{% endif %} ><a href="/">首页</a></li>
                     <li {%if user.view == "chart_k"%}class="active"{% endif %} ><a href="/chart/k/">资金线</a></li>
