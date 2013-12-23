@@ -100,7 +100,10 @@ class YQL:
         quote = results['quote']
         if isinstance(quote, dict):
             quote = [ quote ]
-        return [(dt.strptime(obj['date'], "%Y-%m-%d").date(), obj) for obj in quote]
+        try:
+            return [(dt.strptime(obj['date'], "%Y-%m-%d").date(), obj) for obj in quote]
+        except:
+            return [(dt.strptime(obj['Date'], "%Y-%m-%d").date(), obj) for obj in quote]
 
 
     def stock_history(self, stock_code, start_date, end_date, suffix=None):

@@ -1,0 +1,42 @@
+{% extends 'www/html/base.html' %}
+{% block meta %}
+<title>注册 - MoneyCharts</title>
+{% endblock %}
+
+{% block main %}
+<legend>创建一个账户</legend>
+
+{% if form.errors %}
+<div class="alert alert-info"><p class="error">抱歉，参数填写错误。</p></div>
+{% endif %}
+
+<div class="">
+    <form action="" method='POST' class="form-horizontal">
+        {% csrf_token %}
+        <div class="control-group">
+            <label class="control-label" for="id_username">用户名：</label>
+            <div class="controls">
+                {{form.username|safe}}
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="id_password1">密码：</label>
+            <div class="controls">
+                {{form.password1|safe}}
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="id_password2">确认密码：</label>
+            <div class="controls">
+                {{form.password2|safe}}
+            </div>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-large btn-primary">注册</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

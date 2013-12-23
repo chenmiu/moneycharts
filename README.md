@@ -10,6 +10,7 @@
  - 持股状况
  - 分享给股友
  - 简单账户体系
+ - 程序化交易：放量上涨+2，缩量上涨+1，缩量下跌-1，放量下跌-2
 
 ### 欢迎提意见
 
@@ -25,3 +26,4 @@
  - [Yahoo!金融数据接口](http://developer.yahoo.com/yql/console/): 提供YQL这么高端洋气上档次的股票接口（就是性能有些慢）
  
 本站点代码开源，托管在[Github](https://github.com/talebook/moneycharts)上。感谢您的关注。
+

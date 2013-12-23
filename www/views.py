@@ -6,7 +6,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages, auth
 from decimal import Decimal
 from datetime import datetime, timedelta
 from www.models import *
@@ -175,6 +176,24 @@ def chart_build(request):
     profile.free = free
     profile.is_outdate = 0
     profile.save()
+
+    # month nodes
+    m_list = []
+    m = Node(type=Node.TYPES['MONTH'], open=0, date=day, user=request.user)
+    m.low = m.high = m.close = m.open
+    close = 0
+    for n in nodes:
+        if n.date.month != m.date.month:
+            m_list.append( m )
+            m = Node(type=Node.TYPES['MONTH'], open=n.open, date=n.date, user=request.user)
+            m.low = m.high = m.close = m.open
+        if n.low < m.low: m.low = n.low
+        if n.high > m.high: m.high = n.high
+        if n.base > m.base: m.base = n.base
+        m.close += n.close - n.open
+    m_list.append( m )
+    Node.objects.bulk_create( m_list )
+
     return HttpResponseRedirect('/chart/k/')
 
 
@@ -260,9 +279,20 @@ def chart_k(request):
 @login_required(login_url="/account/login/")
 def chart_e(request):
     setattr(request.user, 'view', "chart_e")
-    return render(request, 'www/html/chart/e.html')
+    nodes = request.user.node_set.filter(type=Node.TYPES['MONTH']).order_by("-date").all()
+    return render(request, 'www/html/chart/e.html', {'nodes': nodes})
 
 def about(request):
     setattr(request.user, 'view', "about")
     return render(request, 'www/html/about.html')
+
+def account_reg(request):
+    form = UserCreationForm()
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            messages.add_message(request, messages.SUCCESS, '您已注册成功。')
+            return HttpResponseRedirect('/analyse/')
+    return render(request, 'www/html/account/reg.html', {'form': form})
 
