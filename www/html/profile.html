@@ -26,10 +26,8 @@
     （<span style="background-color: {% if r < 0 %}#00FF00{% else %}red{%endif%}">{{ r|int }} %</span>）。
     </p>
     <p>
-    {% set a = user.bill_set.first().date %}
-    {% set b = user.bill_set.last().date %}
-    {{a.year}}年{{a.month}}月{{a.day}}日至今，
-    共有{{user.bill_set.count()}}笔资金操作, 平均每月{{(30*user.bill_set.count()/(b-a).days)|int}}笔交易。
+    {% set a = user.bill_set.all()[0].date %}
+    {{a.year}}年{{a.month}}月{{a.day}}日至今，共有{{user.bill_set.count()}}笔资金操作。
     </p>
 </div>
 
@@ -59,7 +57,7 @@
     <form method="POST" action="/bill/update/" onsubmit="return check_files()"
         class="form-horizontal" enctype="multipart/form-data">
         {% csrf_token %}
-        <input class="span6" id="input_file" type="file" name="data" />
+        <input class="col-md-6" id="input_file" type="file" name="data" />
         <button type="submit" class="btn btn-primary">提交更新</button>
     </form>
 </div>

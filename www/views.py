@@ -14,6 +14,13 @@ from www.models import *
 from www.codelist import Codes
 from www.yahoo import YQL
 
+def day0(day):
+    ret = day - timedelta(hours=day.hour, minutes=day.minute)
+    if ret.day != day.day: raise
+    return ret
+
+def month0(day):
+    return datetime(day.year, day.month, 1)
 
 def index(request):
     setattr(request.user, 'view', "index")
@@ -115,11 +122,14 @@ def chart_build(request):
             querys[code] = [code, b.date, None]
         querys[code][2] = b.date
     yql = YQL()
-    infos = yql.stocks_history(querys.values())
+    yql.infos = yql.stocks_history(querys.values())
+    querys = None
 
     # build nodes
-    day = bills[0].date
-    today = bills[len(bills)-1].date
+    first_day = day0(bills[0].date)
+    day = first_day
+    #today = bills[len(bills)-1].date
+    today = timezone.now()
     oneday = timedelta(days=1)
     n = Node(type=Node.TYPES['DAY'], open=0, date=day, user=request.user)
     n.low = n.high = n.close = n.open
@@ -127,14 +137,14 @@ def chart_build(request):
     stocks = {}
     base = 0
     free = 0
+    balance = 0
     nodes = []
 
     # FIXME there are bugs
     idx = 0
-    while idx < len(bills) and day <= today:
-        b = bills[idx]
-        if n.date.date() == b.date.date():
-            n.date = b.date
+    while day <= today:
+        if idx < len(bills) and n.date.date() == bills[idx].date.date():
+            b = bills[idx]
             s = stocks.get(b.stock_code, {'num': 0, 'money': 0})
             s['num'] += b.stock_num
             s['money'] += b.stock_money
@@ -143,12 +153,13 @@ def chart_build(request):
             if b.type == b.TYPES['PUT'] or b.type == b.TYPES['GET']:
                 base += b.stock_money
             idx += 1
+            balance = b.balance
         else:
             n.low = n.high = n.close = free
             for code,s in stocks.items():
                 if s['num'] == 0: continue
                 # 查找当天股票价格，计算波动
-                h = bisect_find(infos, code, day)
+                h = bisect_find(yql.infos, code, day)
                 if h:
                     n.low += s['num']*D(h['Low'])
                     n.high += s['num']*D(h['High'])
@@ -161,7 +172,9 @@ def chart_build(request):
             new_open = n.close
             n.close = n.close + n.base - base
             n.base = base
-            nodes.append( n )
+            n.money = n.close - n.open
+            n.balance = balance
+            if n.date.weekday() < 5: nodes.append( n )
             day += oneday
             n = Node(type=Node.TYPES['DAY'], open=new_open, date=day, user=request.user)
             n.low = n.high = n.close = n.open
@@ -179,18 +192,22 @@ def chart_build(request):
 
     # month nodes
     m_list = []
-    m = Node(type=Node.TYPES['MONTH'], open=0, date=day, user=request.user)
+    m = Node(type=Node.TYPES['MONTH'], open=0, date=month0(first_day), user=request.user)
     m.low = m.high = m.close = m.open
     close = 0
     for n in nodes:
         if n.date.month != m.date.month:
+            logging.error("%s - %s" % (n.date,  m.date))
             m_list.append( m )
-            m = Node(type=Node.TYPES['MONTH'], open=n.open, date=n.date, user=request.user)
+            m = Node(type=Node.TYPES['MONTH'], open=n.open+n.balance, date=month0(n.date), user=request.user)
             m.low = m.high = m.close = m.open
-        if n.low < m.low: m.low = n.low
-        if n.high > m.high: m.high = n.high
+        if n.low+n.balance < m.low: m.low = n.low+n.balance
+        if n.high+n.balance > m.high: m.high = n.high+n.balance
         if n.base > m.base: m.base = n.base
-        m.close += n.close - n.open
+        #m.close += n.close - n.open
+        m.close = n.close+n.balance
+        m.money += n.money
+        m.balance = n.balance
     m_list.append( m )
     Node.objects.bulk_create( m_list )
 
@@ -216,6 +233,9 @@ def bill_update(request):
     for line in data.split("\n"):
         if not line.startswith(u'人民币'):
             continue
+        if u"申购配号" in line:
+            continue
+        line = line.replace(u"申购返款", u"1     申购返款")
         b = Bill()
         vals = p.split(line)
         if vals[3] == u'---':
@@ -250,6 +270,8 @@ def bill_update(request):
             else:
                 b.type = Bill.TYPES['BUY']
 
+            if len(b.stock_code) != 6:
+                logging.error(line)
             # 特殊处理转债问题
             if b.stock_code == u'704016':
                 b.stock_code = u'110023'

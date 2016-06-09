@@ -95,21 +95,27 @@ function build_svg() {
 */
 }
 
-$(document).ready(build_svg);
+setTimeout(function() {
+    //$(document).ready(build_svg);
+}, 1000);
 
 </script>
 {% endblock %}
 
 {% block main %}
 <legend>月度收益表</legend>
-<svg class="chart"></svg>
+<svg class="chart hidden"></svg>
 <table class="table table-fixed table-bordered table-condensed" >
     <thead>
         <tr class="success text-right">
             <th>时间</th>
-            <th>本金</th>
-            <th>月初市值</th>
+            <th class="hidden-xs" title="该月期间，最高投入的本金数额">
+                本金
+                <i class="icon-question-sign"></i>
+            </th>
+            <th class="hidden-xs" >月初市值</th>
             <th>月末市值</th>
+            <th>浮盈</th>
             <th>收益</th>
         </tr>
     </thead>
@@ -117,14 +123,16 @@ $(document).ready(build_svg);
         {% for n in nodes %}
         <tr class="text-right">
             <td class="code">{{n.date.year}}年{{n.date.month}}月</td>
-            <td class="worth">{{n.base}}</td>
-            <td class="worth">{{n.open}}</td>
+            <td class="hidden-xs base">{{n.base}}</td>
+            <td class="hidden-xs worth">{{n.open}}</td>
             <td class="num">{{n.close}}</td>
             {% if n.open == 0 %}
             <td class="money">-</td>
+            <td class="rate">-</td>
             {% else %}
             {% set v = 100*n.close/n.open - 100 %}
-            <td style="color: {%if v>0%}red{%else%}green{%endif%}" class="money">{{ v|int}}%</td>
+            <td style="color: {%if v>0%}red{%else%}green{%endif%}" class="money">{{n.money}}</td>
+            <td style="color: {%if v>0%}red{%else%}green{%endif%}" class="rate">{{ v|int}}%</td>
             {% endif %}
         </tr>
         {% endfor %}

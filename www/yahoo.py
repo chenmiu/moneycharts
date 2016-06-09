@@ -12,6 +12,8 @@ from www.models import *
 
 _yql_url = u"http://query.yahooapis.com/v1/public/yql?"
 class YQL:
+    infos = None
+
     def fmt(self, code, suffix=None):
         if suffix:
             return code + suffix
@@ -32,23 +34,44 @@ class YQL:
                 "callback": ""
                 }
         url = _yql_url + urlencode(params)
+        logging.error("%s" % url)
         html = urlopen(url).read()
         j = json.loads(html)
         return j['query']['results']
 
+    def sina_price(self, s):
+        v = "sz"+s
+        if int(s) >= 600000:
+            v = "sh"+s
+        url = "http://hq.sinajs.cn/list="+v
+        logging.error(url)
+        html = urlopen(url).read()
+        vals = html.split(",")
+        if len(vals) == 1:
+            price = 0
+        elif vals[3] != '0.00':
+            price = vals[3]
+        else:
+            price = vals[2]
+        return Decimal(price)
+
     def stock(self, s):
         c_key = "oquote."+s
+        now = dt.now()
         today = dt.now().date()
         try:
             c = pickle.loads(SimpleCache.objects.get(key=c_key).val)
             if c['date'] >= today: return c['data']
         except: pass
 
+        '''
         code = self.fmt(s)
         yql = u'SELECT * FROM yahoo.finance.oquote WHERE symbol="%s"' % code
         results = self.run(yql)
         if not results: return Decimal(0)
         data = Decimal(results['option']['price'])
+        '''
+        data = self.sina_price(s)
 
         # set to cache
         c_val = {'date': today, 'data': data}
@@ -139,5 +162,10 @@ class YQL:
         for code, start, end in stocks:
             output[code] = self.stock_history(code, start, end)
         return output
+
+if __name__ == "__main__":
+    y = YQL()
+    sql = 'select * from yahoo.finance.historicaldata where symbol = "002556.SZ" and startDate = "2012-12-07" and endDate = "2014-01-11"'
+    y.run(sql)
 
 

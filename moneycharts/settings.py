@@ -7,7 +7,6 @@ import os
 ROOT_DIR=os.path.abspath(os.path.dirname(os.path.abspath(__file__))+'/../')
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -24,7 +23,7 @@ DATABASES = {
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.4/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['moneycharts.talebook.org']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -50,7 +49,7 @@ TIME_FORMAT = 'H:i:s'
 DATETIME_FORMAT = 'Y-m-d H:i:s'
 
 # If you set this to False, Django will not use timezone-aware datetimes.
-USE_TZ = True
+USE_TZ = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -91,6 +90,7 @@ STATICFILES_FINDERS = (
 SECRET_KEY = '@h@y%ijs1_xm@%bfsn*5(d3chz!6fxxrgh#4d5+gj3sq47=ekx'
 
 # List of callables that know how to import templates from various sources.
+'''
 DEFAULT_JINJA2_TEMPLATE_EXTENSION = '.html'
 DEFAULT_JINJA2_TEMPLATE_INTERCEPT_RE = r"^(?!admin/).*"
 TEMPLATE_LOADERS = (
@@ -100,6 +100,37 @@ TEMPLATE_LOADERS = (
     'django_jinja.loaders.AppLoader',
     'django_jinja.loaders.FileSystemLoader',
 )
+'''
+
+TEMPLATES = [
+    {
+        "BACKEND": "django_jinja.backend.Jinja2",
+        "APP_DIRS": True,
+        "DIRS": [ROOT_DIR],
+        "OPTIONS": {
+            "match_extension": ".html",
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        }
+    }, {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -116,13 +147,6 @@ ROOT_URLCONF = 'moneycharts.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'moneycharts.wsgi.application'
 
-TEMPLATE_DIRS = (
-    ROOT_DIR,
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -133,7 +157,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'moneycharts',
     'www',
-    'south',
     'django_jinja',
 )
 
@@ -161,10 +184,6 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        },
-        'null': {
-            'level':'DEBUG',
-            'class':'django.utils.log.NullHandler',
         },
         'logfile': {
             'level':'DEBUG',

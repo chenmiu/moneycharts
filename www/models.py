@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #-*- coding: UTF-8 -*-
 
+import django
 from django.db import models
 from decimal import Decimal
 from datetime import datetime
@@ -57,18 +58,22 @@ class Node(models.Model):
             'MONTH':    2,
             }
     type    = models.IntegerField(default=0)
-    date    = models.DateTimeField(default=datetime.now())
+    date    = models.DateTimeField(default=django.utils.timezone.now)
     low     = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     high    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     open    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     close   = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     base    = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+    money   = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
+    balance = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     user    = models.ForeignKey(User)
 
+    def __unicode__(self):
+        return "type=%d, date=%s, open=%d, close=%d" % (self.type, unicode(self.date), self.open, self.close)
     class Meta:
         unique_together = ( ('user', 'type', 'date'), )
 
 class SimpleCache(models.Model):
-    key = models.CharField(primary_key=True, max_length="256")
+    key = models.CharField(primary_key=True, max_length=256)
     val = models.TextField(default="")
 

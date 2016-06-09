@@ -8,8 +8,8 @@ class BillAdmin(admin.ModelAdmin):
     list_display = ('user', 'date', 'id', 'type', 'name', 'balance', 'stock_code', 'stock_num', 'stock_money')
     list_filter = ('user',)
 class NodeAdmin(admin.ModelAdmin):
-    list_display = ('type', 'date', 'low', 'high', 'open', 'close', 'base')
-    list_filter = ('user',)
+    list_display = ('type', 'date', 'open', 'close', 'low', 'high', 'base', 'balance')
+    list_filter = ('user','type')
 class SimpleCacheAdmin(admin.ModelAdmin):
     list_display = ('key', )
 

@@ -1,26 +1,27 @@
 #!/usr/bin/python
 #-*- coding: UTF-8 -*-
 
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib.auth.views import login, logout
+from www import views
 
-urlpatterns = patterns('',
-    url(r'^$', 'www.views.index'),
-    url(r'^analyse/$', 'www.views.analyse'),
-    url(r'^about/$', 'www.views.about'),
+urlpatterns = [
+    url(r'^$', views.index),
+    url(r'^analyse/$', views.analyse),
+    url(r'^about/$', views.about),
 
-    url(r'^bill/update/$', 'www.views.bill_update'),
+    url(r'^bill/update/$', views.bill_update),
 
-    url(r'^chart/build/$', 'www.views.chart_build'),
-    url(r'^chart/k/$', 'www.views.chart_k'),
-    url(r'^chart/e/$', 'www.views.chart_e'),
+    url(r'^chart/build/$', views.chart_build),
+    url(r'^chart/k/$', views.chart_k),
+    url(r'^chart/e/$', views.chart_e),
 
-    url(r'^stock/list/$', 'www.views.stock_list'),
+    url(r'^stock/list/$', views.stock_list),
 
-    url(r'^account/reg/$', 'www.views.account_reg'),
-    url(r'^account/edit/$', 'www.views.index'),
+    url(r'^account/reg/$', views.account_reg),
+    url(r'^account/edit/$', views.index),
     url(r'^account/login/$', login, {'template_name': "www/html/account/login.html"}),
     url(r'^account/logout/$', logout, {'template_name': "www/html/index.html"}),
-    url(r'^account/profile/$', 'www.views.index'),
-    url(r'^accounts/profile/$', 'www.views.index'),
-)
+    url(r'^account/profile/$', views.index),
+    url(r'^accounts/profile/$', views.index),
+]
