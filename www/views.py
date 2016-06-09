@@ -28,6 +28,12 @@ def index(request):
         return render(request, 'www/html/index.html')
     return render(request, 'www/html/profile.html')
 
+@login_required(login_url="/account/login/")
+def stock_detail(request, stock_code):
+    stock_name = None
+    bills = request.user.bill_set.filter(stock_code=stock_code).order_by('date').all()
+    if bills: stock_name = bills[0].stock_name
+    return render(request, 'www/html/stock/detail.html', vars())
 
 @login_required(login_url="/account/login/")
 def stock_list(request):
@@ -42,13 +48,15 @@ def stock_list(request):
     history = []
     for code,s in stocks.items():
         if code == '': continue
+        s['code'] = code
         if s['num'] > 0:
             s['worth'] = yql.stock(code) * s['num']
             s['earn'] = s['worth'] + s['money']
-            current.append( (Name(code), s) )
+            current.append( (s['name'], s) )
         else:
-            history.append( (Name(code), s) )
-    history.sort( lambda x,y: cmp(y[1]['money'], x[1]['money']) )
+            history.append( (s['name'], s) )
+    history.sort( lambda x,y: cmp(float(y[1]['money']), float(x[1]['money'])) )
+    current.sort( lambda x,y: cmp(float(y[1]['worth']), float(x[1]['worth'])) )
     return render(request, 'www/html/stock/list.html', {'current': current, 'history': history})
 
 def get_stock_worth(stocks):
@@ -148,6 +156,7 @@ def chart_build(request):
             s = stocks.get(b.stock_code, {'num': 0, 'money': 0})
             s['num'] += b.stock_num
             s['money'] += b.stock_money
+            s['name'] = b.stock_name
             stocks[b.stock_code] = s
             free += b.stock_money
             if b.type == b.TYPES['PUT'] or b.type == b.TYPES['GET']:
@@ -233,13 +242,15 @@ def bill_update(request):
     for line in data.split("\n"):
         if not line.startswith(u'人民币'):
             continue
-        if u"申购配号" in line:
-            continue
-        line = line.replace(u"申购返款", u"1     申购返款")
+        if u"申购配号" in line: continue
+        if u'新股入帐' in line: continue
+        line = line.replace(u"人民币                        ", u"人民币          未知名称          ")
+        line = line.replace(u"                      申购", u"         1            申购")
+        line = line.replace(u"                      新股申购", u"         1            新股申购")
         b = Bill()
         vals = p.split(line)
         if vals[3] == u'---':
-            vals = [''] + vals
+            vals = vals
             b.account = vals[14]
             b.id = ";".join([ str(b.user_id), b.account, vals[2] ])
             b.date = get_date(vals[2])
@@ -272,12 +283,18 @@ def bill_update(request):
 
             if len(b.stock_code) != 6:
                 logging.error(line)
+                continue
             # 特殊处理转债问题
             if b.stock_code == u'704016':
                 b.stock_code = u'110023'
                 if b.stock_money == 0:
                     b.stock_money = 0
                     b.stock_num = 1
+            if b.stock_code.startswith("780"):
+                b.stock_code = u'601' + b.stock_code[3:]
+            if b.stock_code.startswith("732"):
+                b.stock_code = u'603' + b.stock_code[3:]
+
         if b.date.date() > today.date():
             raise "not large than today"
         b.user = request.user

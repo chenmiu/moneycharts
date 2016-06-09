@@ -43,13 +43,16 @@ class Bill(models.Model):
     # 股票名称、代码、价格、数量、总价
     stock_name  = models.CharField(max_length=16, default="")
     stock_code  = models.CharField(max_length=16, default="")
-    stock_price = models.IntegerField(default=Decimal(0))
     stock_num   = models.IntegerField(default=Decimal(0))
+    stock_price = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
     stock_money = models.DecimalField(max_digits=19, decimal_places=2, default=Decimal(0))
 
     # 用户、账户ID
     user    = models.ForeignKey(User)
     account = models.CharField(max_length=128, default="")
+
+    def get_deal_id(self):
+        return self.id.split(";")[-1]
 
 class Node(models.Model):
     TYPES = {

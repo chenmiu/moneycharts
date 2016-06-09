@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^chart/e/$', views.chart_e),
 
     url(r'^stock/list/$', views.stock_list),
+    url(r'^stock/detail/(\d+)/$', views.stock_detail),
 
     url(r'^account/reg/$', views.account_reg),
     url(r'^account/edit/$', views.index),

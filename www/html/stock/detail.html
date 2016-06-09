@@ -1,0 +1,45 @@
+{% extends 'www/html/base.html' %}
+{% block meta %}
+<style>
+    .table-fixed { table-layout: fixed; }
+</style>
+<title>持股 - MoneyCharts</title>
+{% endblock %}
+
+{% block main %}
+{% if not stock_name %}
+<p class="text-center">
+该股票没有交易记录！
+</p>
+{% else %}
+<legend>交易记录：{{ stock_name }} </legend>
+<table class="table table-fixed table-bordered table-condensed" >
+    <thead>
+        <tr class="success">
+            <th class="text-center">成交日期</th>
+            <th class="text-center">成交号</th>
+            <th class="text-center" style="width:250px">证券名称</th>
+            <th class="text-center">成交数量</th>
+            <th class="text-center">成交价格</th>
+            <th class="text-center">成交金额</th>
+            <th class="text-center">税费合计</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for bill in bills %}
+    <tr>
+        <td class="text-center date">{{bill.date.strftime("%Y-%m-%d")}}</td>
+        <td class="text-center date">{{bill.get_deal_id()}}</td>
+        <td class="text-right name">{{bill.name}}</td>
+        <td class="text-right num">{{bill.stock_num}}</td>
+        <td class="text-right price">{{bill.stock_price}}</td>
+        <td class="text-right money">{{bill.stock_money}}</td>
+        <td class="text-right tax_fee">{{bill.tax + bill.fee1 + bill.fee2 + bill.fee2}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% endblock %}
+

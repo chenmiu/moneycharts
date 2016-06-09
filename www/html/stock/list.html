@@ -28,8 +28,8 @@
         <td class="price"> - </td>
     </tr>
     {% for code, s in current %}
-    <tr id="s{{code}}" >
-        <td class="code">{{code}}</td>
+    <tr id="s{{s.code}}" >
+        <td class="code"><a href="/stock/detail/{{s.code}}/">{{code}}</a></td>
         <td class="worth">{{s.worth}}</td>
         <td class="num">{{s.num}}</td>
         <td class="money">{{s.earn}}</td>
@@ -46,8 +46,8 @@
     </thead>
     <tbody>
     {% for code, s in history %}
-    <tr id="s{{code}}" >
-        <td class="code">{{code}}</td>
+    <tr id="s{{s.code}}" >
+        <td class="code"><a href="/stock/detail/{{s.code}}/">{{code}}</a></td>
         <td class="money">{{s.money}}</td>
     </tr>
     {% endfor %}

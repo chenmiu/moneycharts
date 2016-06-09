@@ -38,7 +38,7 @@
                     <li {%if user.view == "about"%}class="active"{% endif %} ><a href="/about/">关于</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    {% if not user.is_authenticated %}
+                    {% if not user.is_authenticated() %}
                     <li><a href="/account/login/">登入</a></li>
                     {% else %}
                     <li class="dropdown">
@@ -54,7 +54,7 @@
             </div>
         </nav>
 
-        {% if user.is_authenticated and user.profile.is_outdate %}
+        {% if user.is_authenticated() and user.profile.is_outdate %}
         <div class="container">
             <div class="row">
                 <div class="offset2 span8">
@@ -81,7 +81,7 @@
                     </ul>
                     {% endif %}
                     {% if user.view != "index" and user.view != "about" %}
-                    {% if user.is_authenticated and user.bill_set.count == 0 %}
+                    {% if user.is_authenticated() and user.bill_set.count() == 0 %}
                     <div class="alert alert-warning"><p><a href="/">请先在首页更新您的资金数据。</a></p></div>
                     {% endif %}
                     {% endif %}
@@ -96,7 +96,7 @@
         <script src="/m/js/bootstrap.min.js?v=20140103"></script>
         <script src="/m/js/spin.min.js?v=20140103"></script>
         <!--<script src="http://tajs.qq.com/stats?sId=29043744"></script>-->
-        {% if user.is_authenticated and user.profile.is_outdate %}
+        {% if user.is_authenticated() and user.profile.is_outdate %}
         <script>
             function rebuild() {
                 var opts = {
